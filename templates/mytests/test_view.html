@@ -1,0 +1,39 @@
+{% extends 'index.html' %}
+
+{% block title %}
+{{ test.title }}
+{% endblock %}
+
+{% block content %}
+    <h1>{{ test.title }}</h1>
+    <p>{{ test.description }}</p>
+    <p><i>{{ test.date }}</i></p>
+
+    {% if test.img %}
+        <img src="{{ test.img.url }}" width="200"><br>
+    {% endif %}
+
+    <a href="{% url 'run_test' id=test.id %}"><h4>run test</h4></a>
+    <p>Passed times: {{ passed_times }}</p>
+
+        {% if request.user.is_authenticated %}
+    <form action="" method="post">
+    {% csrf_token %}
+    {{ comment_form }}
+    <button type="submit" class="btn btn-primary">Save</button>
+
+
+    </form>
+ {% endif %}
+
+             {% for comment in comments.reverse %}
+        <p>{{ comment }}</p>
+    {% endfor %}
+
+
+
+
+
+
+
+{% endblock %}

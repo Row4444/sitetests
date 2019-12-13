@@ -1,0 +1,23 @@
+{% extends 'index.html' %}
+{% load socialaccount %}
+{% providers_media_js %}
+{% block title %}
+    LOGIN
+{% endblock %}
+
+{% block content %}
+
+    <form action="" method="post">
+    {% csrf_token %}
+    {% for form in login_form %}
+        {{ form.label_tag }}
+        {{ form }}
+        <hr>
+    
+    {% endfor %}
+        <input type="submit">
+    </form>
+
+    <a href="{% provider_login_url 'google' method="oauth2" %}">Google</a>
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'index.html' %}
+
+{% block title %}
+registration
+{% endblock %}
+
+{% block content %}
+    <form action="" method="post">
+    {% csrf_token %}
+        {% for form in registration_form %}
+            {{ form.label_tag }}
+            {{ form }}
+            <hr>
+        {% endfor %}
+    <input type="submit">
+    </form>
+{% endblock %}

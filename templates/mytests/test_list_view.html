@@ -1,0 +1,31 @@
+{% extends 'index.html' %}
+
+{% block title %}
+Tests
+{% endblock %}
+
+{% block content %}
+    <center><h1>Tests :</h1></center>
+    {% for test in tests %}
+        <div class="card text-center" style="margin-top: 20px">
+            <div class="card-header">
+                {% if test_users.test.id == test.id %}
+                    {{ test_users }}
+                {% endif %}
+                {% if not test_users %}
+                    {{ test.author }}
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">{{test.title}}</h4>
+                <p class="card-text">{{test.description}}</p>
+                <a href="{% url 'test_detail' id=test.id %}" class="btn btn-primary">View test</a>
+            </div>
+        <div class="card-footer text-muted">
+        {{test.date}}
+        </div>
+        </div>
+    {% endfor %}
+
+
+{% endblock %}

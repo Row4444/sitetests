@@ -1,0 +1,30 @@
+{% extends 'index.html' %}
+
+
+{% block title %}
+{{ user.username }}
+{% endblock %}
+
+{% block content %}
+    <h1>{{ user.username }}</h1>
+
+    {% if user.img %}
+
+            <img src="{{ user.img.url }}" width="300" >
+
+
+    {% endif %}
+
+    <form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for form in update_form %}
+
+
+        {{ form.label_tag }}
+        {{ form }}
+        <hr>
+    {% endfor %}
+        <input type="submit">
+    </form>
+
+{% endblock %}
