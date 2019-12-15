@@ -5,7 +5,7 @@ from mytest.models import TestUserList
 
 class UserAnswersInLine(admin.TabularInline):
     model = TestUserList
-    extra = 1
+    extra = 0
 
 
 class UserAdmin(admin.ModelAdmin):

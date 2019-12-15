@@ -6,6 +6,11 @@
 {% endblock %}
 
 {% block content %}
+    {% if email_message %}
+        <center>
+            <p style="color: #ff6b70">{{ email_message }}</p>
+        </center>
+    {% endif %}
     <h1>{{ user.username }}</h1>
 
     {% if user.img %}

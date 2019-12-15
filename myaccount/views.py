@@ -1,11 +1,18 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail
 from django.shortcuts import render, get_object_or_404, redirect
 
 # Create your views here.
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views import View
+
 
 from myaccount.forms import RegistrationForm, UpdateUserForm, LoginForm
 from myaccount.models import User
+from myaccount.tokens import account_activation_token
 
 
 class Registration(View):
@@ -28,6 +35,17 @@ class Registration(View):
                     username=username,
                     password=password1,
                 )
+
+                current_site = get_current_site(request)
+                user = User.objects.get(username=username)
+                message = render_to_string('account/activate_email.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.id)),
+                    'token': account_activation_token.make_token(user),
+                })
+                send_mail('Simple subject', message, 'sitetests1111@gmail.com', [user.email])
+
                 login(request, account)
 
                 return redirect('update')
@@ -52,7 +70,6 @@ class Login(View):
             print(request.POST)
             form = LoginForm(request.POST)
 
-            print(form.errors)
             if form.is_valid():
                 print('------')
                 username = request.POST['username']
@@ -71,23 +88,45 @@ class UpdateAccount(View):
         context = {}
         user = get_object_or_404(User, id=request.user.id)
         update_form = UpdateUserForm(instance=user)
+        if not user.is_verificate and user.email:
+            context['email_message'] = 'Check your email: ' + user.email
         context['user'] = user
         context['update_form'] = update_form
 
         return render(request, 'account/detail.html', context)
 
     def post(self, request):
-        context = {}
         user = get_object_or_404(User, id=request.user.id)
-        print(request.FILES)
         update_form = UpdateUserForm(request.POST, request.FILES, instance=user)
+
         if update_form.is_valid():
+            new_user_email = update_form.cleaned_data['email']
+            if list(new_user_email) == list(user.email):
+                current_site = get_current_site(request)
+                user.is_verificate = False
+                message = render_to_string('account/activate_email.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.id)),
+                    'token': account_activation_token.make_token(user),
+                })
+                send_mail('Simple subject', message, 'sitetests1111@gmail.com', [new_user_email])
+
             update_form.save()
 
-        context['user'] = user
-        context['update_form'] = update_form
+        return redirect('update')
 
-        return render(request, 'account/detail.html', context)
+
+def activate(request, idb64, token):
+    try:
+        id = force_text(urlsafe_base64_decode(idb64))
+        user = User.objects.get(id=id)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_verificate = True
+        user.save()
+    return redirect('tests')
 
 
 def logout_view(request):

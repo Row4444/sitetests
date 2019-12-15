@@ -10,11 +10,15 @@
         <h4>{{ help_error }}</h4>
     {% endif %}
 
-    {% if request.user.is_authenticated %}
-        <h5>last try</h5>
-        {% for foo in test_compl %}
+    {% for foo in test_compl %}
             <h4 style="color: green">{{ foo }}</h4><br>
         {% endfor %}
+
+    {% if not test_compl %}
+
+    {% if request.user.is_authenticated %}
+        <h5>last try</h5>
+
         <h1 class="mt-5">
               Tets: <i>{{ test}}</i>
         </h1>
@@ -47,7 +51,7 @@
 
                 <input type="submit">
             </form>
-
+    {% endif %}
 
 
 {% endif %}

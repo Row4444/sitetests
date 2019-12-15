@@ -3,7 +3,6 @@ from django.views import View
 # Create your views here.
 from .forms import TestForm, QuestionForm, AnswerForm, CommentForm
 from .models import Question, Test, Answer, User, TestUserList, Comment
-from math import ceil
 
 
 def parting(xs, parts=4):
@@ -23,9 +22,9 @@ class TestView(View):
         user = request.user
         passed_times = TestUserList.objects.filter(test=test)
         context['passed_times'] = len(passed_times)
+        context['passed'] = passed_times
         context['test'] = test
         context['user'] = user
-
         comment_form = CommentForm()
         context['comment_form'] = comment_form
         context['comments'] = Comment.objects.filter(test=test)
@@ -63,24 +62,23 @@ class TestList(View):
             tests = Test.objects.all()
             context['tests'] = tests
 
-        if request.user.is_authenticated:
-            context['test_users'] = TestUserList.objects.filter(user=request.user).reverse()
+        if request.user.is_authenticated and request.user.is_verificate:
+            context['test_users'] = TestUserList.objects.filter(user=request.user)
         return render(request, 'mytests/test_list_view.html', context)
 
 
 class TestListYet(View):
     def get(self, request):
         context = {}
-        tests_yet = TestUserList.objects.filter(user=request.user)
         tests = Test.objects.all()
-        context['tests'] = tests
         if request.user.is_authenticated:
             tests_users = TestUserList.objects.filter(user=request.user)
             test = set()
             for i in tests_users:
                 one_test = Test.objects.get(id=i.test.id)
                 test.add(one_test)
-                context['tests'] = test
+            context['tests'] = test
+            context['test_users'] = TestUserList.objects.filter(user=request.user)
         return render(request, 'mytests/test_list_view.html', context)
 
 
@@ -91,10 +89,12 @@ class CreateTest(View):
         question_form = QuestionForm()
         answer_form = AnswerForm()
         range_list = range(1, 10)
+
         context['test_form'] = test_form
         context['question_form'] = question_form
         context['answer_form'] = answer_form
         context['range_list'] = range_list
+
         return render(request, 'mytests/test_create_view.html', context)
 
     def post(self, request):
@@ -110,6 +110,8 @@ class CreateTest(View):
         context['range_list'] = range_list
         if not request.user.is_authenticated:
             return redirect('login')
+        if not request.user.is_verificate:
+            return redirect('update')
         author = request.user
 
         test_parameters = dict(request.POST)
@@ -121,11 +123,6 @@ class CreateTest(View):
 
         num_questions = 0
         num_answers = 0
-
-        """
-        else:
-            context['help_error'] = 'test must have title and description'
-            return render(request, 'mytests/test_create_view.html', context)"""
 
         for q in test_parameters['question']:
             if q != '':
@@ -144,7 +141,7 @@ class CreateTest(View):
                 if not test_parameters[str(i)]:
                     context['help_error'] = 'Alls question must have true answer'
                     return render(request, 'mytests/test_create_view.html', context)
-            except IndexError:
+            except KeyError:
                 context['help_error'] = 'Alls question must have true answer'
                 return render(request, 'mytests/test_create_view.html', context)
 
@@ -159,9 +156,9 @@ class CreateTest(View):
                 new_test.author = author
                 new_test.title = test_form.cleaned_data['title']
                 new_test.description = test_form.cleaned_data['description']
-                new_test.save()
+                new_test.save()  # создали новый тест
 
-            for question in test_questions:
+            for question in test_questions:  # создаем вопросы для теста
                 new_q_parametrs = {'question': question}
                 q_form = QuestionForm(new_q_parametrs)
                 if q_form.is_valid():
@@ -173,7 +170,7 @@ class CreateTest(View):
 
                 num_of_a = 0
 
-                for answ in test_answers[num_of_q]:
+                for answ in test_answers[num_of_q]:  # заполняем вопросы ответами
                     num_of_a += 1
                     true_answer = test_parameters[str(num_of_q + 1)][0] == str(num_of_a)
                     new_a_parametrs = {'answer': answ, 'is_correctly': true_answer}
@@ -224,7 +221,7 @@ class TestRun(View):
                 if list(user_answer) == list(true_answ.answer):
                     answers_in_procent += 1
             oneh_procent += 1
-        result_in_proc = int((100 / oneh_procent) * answers_in_procent)
+        result_in_proc = int((100 / oneh_procent) * answers_in_procent)  # переводим правельные ответы в %
         new = TestUserList(user=request.user, test=test, completed_on=result_in_proc)
         new.save()
 
@@ -237,4 +234,4 @@ class TestRun(View):
         context['questions'] = questions
         context['answers'] = answers
 
-        return render(request, 'mytests/test_run_view.html', context)
+        return redirect('test_detail', id=test.id)

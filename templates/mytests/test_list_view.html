@@ -5,16 +5,26 @@ Tests
 {% endblock %}
 
 {% block content %}
+
+    <ul class="nav justify-content-center">
+          <li class="nav-item">
+                <a class="nav-link active" href="{% url 'mytests' %}">passed tests</a>
+          </li>
+          <li class="nav-item">
+                <a class="nav-link" href="{% url 'tests' %}">data</a>
+          </li>
+    </ul>
+
     <center><h1>Tests :</h1></center>
     {% for test in tests %}
         <div class="card text-center" style="margin-top: 20px">
             <div class="card-header">
-                {% if test_users.test.id == test.id %}
-                    {{ test_users }}
+            {% for test_user in test_users %}
+                {% if test_user.test.id == test.id %}
+                    passed
                 {% endif %}
-                {% if not test_users %}
-                    {{ test.author }}
-                {% endif %}
+            {% endfor %}
+
             </div>
             <div class="card-body">
                 <h4 class="card-title">{{test.title}}</h4>

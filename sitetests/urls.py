@@ -17,7 +17,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from myaccount.views import Registration, UpdateAccount, logout_view, Login
+from myaccount.views import Registration, UpdateAccount, logout_view, Login, activate
 from mytest.views import index
 from sitetests import settings
 
@@ -29,6 +29,7 @@ urlpatterns = [
     path('login/', Login.as_view(), name='login'),
     path('update/', UpdateAccount.as_view(), name='update'),
     path('logout/', logout_view, name='logout'),
-    path('accounts/', include('allauth.urls'))
+    path('accounts/', include('allauth.urls')),
+    path('activate/<idb64>/<token>/', activate, name='activate'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
