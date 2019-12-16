@@ -55,29 +55,29 @@ class TestList(View):
         context = {}
 
         search = request.GET.get('search', '')
+        order = request.GET.get('order', '')
+
+        if order == '' or order == 'date':
+            tests = Test.objects.all().order_by('date')
+            context['tests'] = tests
+        elif order == 'datelast':
+            tests = Test.objects.all().order_by('date').reverse()
+            context['tests'] = tests
+        elif order == 'passed':
+            if request.user.is_authenticated:
+                tests_users = TestUserList.objects.filter(user=request.user)
+                tests = set()
+                for i in tests_users:
+                    one_test = Test.objects.get(id=i.test.id)
+                    tests.add(one_test)
+                context['tests'] = tests
+
+            else:
+                context['tests'] = Test.objects.all()
         if search:
-            tests = Test.objects.filter(title__icontains=search)
+            tests = Test.objects.filter(title__iexact=search)  # __icontains
             context['tests'] = tests
-        else:
-            tests = Test.objects.all()
-            context['tests'] = tests
-
-        if request.user.is_authenticated and request.user.is_verificate:
-            context['test_users'] = TestUserList.objects.filter(user=request.user)
-        return render(request, 'mytests/test_list_view.html', context)
-
-
-class TestListYet(View):
-    def get(self, request):
-        context = {}
-        tests = Test.objects.all()
         if request.user.is_authenticated:
-            tests_users = TestUserList.objects.filter(user=request.user)
-            test = set()
-            for i in tests_users:
-                one_test = Test.objects.get(id=i.test.id)
-                test.add(one_test)
-            context['tests'] = test
             context['test_users'] = TestUserList.objects.filter(user=request.user)
         return render(request, 'mytests/test_list_view.html', context)
 
@@ -88,7 +88,7 @@ class CreateTest(View):
         test_form = TestForm()
         question_form = QuestionForm()
         answer_form = AnswerForm()
-        range_list = range(1, 10)
+        range_list = range(1, 31)
 
         context['test_form'] = test_form
         context['question_form'] = question_form

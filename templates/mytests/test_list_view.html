@@ -5,15 +5,13 @@ Tests
 {% endblock %}
 
 {% block content %}
-
-    <ul class="nav justify-content-center">
-          <li class="nav-item">
-                <a class="nav-link active" href="{% url 'mytests' %}">passed tests</a>
-          </li>
-          <li class="nav-item">
-                <a class="nav-link" href="{% url 'tests' %}">data</a>
-          </li>
-    </ul>
+    <center>
+    <form action="{% url 'tests' %}">
+        <button type="submit" name="order" value="date" >From First to Last</button>
+        <button type="submit" name="order" value="passed" >passed</button>
+        <button type="submit" name="order" value="datelast" >From Last to First</button>
+    </form>
+    </center>
 
     <center><h1>Tests :</h1></center>
     {% for test in tests %}
@@ -22,6 +20,8 @@ Tests
             {% for test_user in test_users %}
                 {% if test_user.test.id == test.id %}
                     passed
+                {% else %}
+                    not passed
                 {% endif %}
             {% endfor %}
 
