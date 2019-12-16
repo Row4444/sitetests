@@ -27,6 +27,8 @@ class AnswerForm(forms.ModelForm):
 
 
 class CommentForm(forms.ModelForm):
+    body = forms.CharField(max_length=250, label='Comment')
+
     class Meta:
         model = Comment
         fields = ('body',)

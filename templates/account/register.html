@@ -1,17 +1,13 @@
 {% extends 'index.html' %}
-
+{% load crispy_forms_tags %}
 {% block title %}
 registration
 {% endblock %}
 
 {% block content %}
-    <form action="" method="post">
+    <form action="" method="post" novalidate>
     {% csrf_token %}
-        {% for form in registration_form %}
-            {{ form.label_tag }}
-            {{ form }}
-            <hr>
-        {% endfor %}
+        {{registration_form|crispy}}
     <input type="submit">
     </form>
 {% endblock %}

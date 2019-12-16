@@ -1,4 +1,5 @@
 {% extends 'index.html' %}
+{% load crispy_forms_tags %}
 
 {% block title %}
 {{ test.title }}
@@ -21,10 +22,9 @@
     <p>Passed times: {{ passed_times }}</p>
 
         {% if request.user.is_authenticated %}
-    <form action="" method="post" class="form-group">
-    {% csrf_token %}
-
-        Comment: {{ comment_form.body }}
+    <form action="" method="post" novalidate>
+        {% csrf_token %}
+        {{comment_form|crispy}}
         <button type="submit" class="btn btn-primary">Save</button>
 
     </form>
@@ -32,6 +32,7 @@
 
     {% for comment in comments.reverse %}
         <p>{{ comment }}</p>
+
     {% endfor %}
 
 
