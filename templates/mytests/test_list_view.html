@@ -1,0 +1,41 @@
+{% extends 'index.html' %}
+
+{% block title %}
+Tests
+{% endblock %}
+
+{% block content %}
+    <center>
+    <form action="{% url 'tests' %}">
+        <button type="submit" name="order" value="date" >From First to Last</button>
+        <button type="submit" name="order" value="passed" >passed</button>
+        <button type="submit" name="order" value="datelast" >From Last to First</button>
+    </form>
+    </center>
+
+    <center><h1>Tests :</h1></center>
+    {% for test in tests %}
+        <div class="card text-center" style="margin-top: 20px">
+            <div class="card-header">
+            {% for test_user in test_users %}
+                {% if test_user.test.id == test.id %}
+                    passed
+                {% else %}
+                    not passed
+                {% endif %}
+            {% endfor %}
+
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">{{test.title}}</h4>
+                <p class="card-text">{{test.description}}</p>
+                <a href="{% url 'test_detail' id=test.id %}" class="btn btn-primary">View test</a>
+            </div>
+        <div class="card-footer text-muted">
+        {{test.date}}
+        </div>
+        </div>
+    {% endfor %}
+
+
+{% endblock %}

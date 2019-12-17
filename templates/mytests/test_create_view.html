@@ -1,0 +1,57 @@
+{% extends 'index.html' %}
+
+{% block title %}
+    Create Test
+{% endblock %}
+
+{% block content %}
+    <h1>Create Test</h1>
+    <h5> Tests with {{ num_of_q }} questions. if you want to change, insert the number of questions in the form below. </h5>
+    {% if help_error %}
+    <p style="color: red">{{ help_error }}</p>
+    {% endif %}
+    <p>Num of questions:</p>
+    <form action="">
+        <input type="number" name="num_of_q">
+        <input type="submit">
+    </form>
+
+    <form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% for tform in test_form %}
+    <br>
+        {{ tform.label_tag }}
+        {{ tform }}
+
+    {% endfor %}<hr>
+
+    {% for range in range_list %}
+        <h5>{{ range }} question</h5>
+        {% for qform in question_form %}
+            <div style="background-color: green" >
+                {{ qform }}<hr>
+            </div>
+        {% endfor %}
+
+        {% for num in 1234|make_list %}
+
+            <input type="radio" id="{{ num }}" name="{{ range }}" value="{{ num }}"><label for="{{ num }}" type="text">True</label>
+            <label >{{ answer_form.answer }}</label><hr>
+
+        {% endfor %}
+
+
+        {% if range >= 5 %}
+
+            <input type="submit">
+                        <br><br><hr><hr>
+        {% endif %}
+
+    {% endfor %}
+
+
+    </form>
+
+
+{% endblock %}
