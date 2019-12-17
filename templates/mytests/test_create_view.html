@@ -6,10 +6,15 @@
 
 {% block content %}
     <h1>Create Test</h1>
+    <h5> Tests with {{ num_of_q }} questions. if you want to change, insert the number of questions in the form below. </h5>
     {% if help_error %}
     <p style="color: red">{{ help_error }}</p>
     {% endif %}
-
+    <p>Num of questions:</p>
+    <form action="">
+        <input type="number" name="num_of_q">
+        <input type="submit">
+    </form>
 
     <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}

@@ -85,11 +85,12 @@ class TestList(View):
 class CreateTest(View):
     def get(self, request):
         context = {}
+        num_of_q = request.GET.get('num_of_q', 5)
         test_form = TestForm()
         question_form = QuestionForm()
         answer_form = AnswerForm()
-        range_list = range(1, 31)
-
+        range_list = range(1, int(num_of_q) + 1)
+        context['num_of_q'] = num_of_q
         context['test_form'] = test_form
         context['question_form'] = question_form
         context['answer_form'] = answer_form

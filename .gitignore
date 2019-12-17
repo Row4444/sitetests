@@ -2,5 +2,9 @@ __pycache__/
 *.py[cod]
 
 mytest/__pycache__/
+myaccount/__pycache__/
 
 */__pycache__/
+
+media/
+*.sqlite
